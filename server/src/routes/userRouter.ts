@@ -3,9 +3,9 @@ import { IUser, User } from "../models/User"
 import bcrypt from "bcrypt"
 import { Result, ValidationError, validationResult } from "express-validator"
 import jwt, { JwtPayload } from "jsonwebtoken"
-import { Collection } from "mongoose"
 import { registerValidators, loginValidators } from "../validators/userValidators"
 import { validateUser, userRequest } from "../middleware/validateToken"
+import { decryptCredentials } from "../middleware/decryptTraffic";
 
 // declare router
 const userRouter: Router = Router()
@@ -13,6 +13,7 @@ const userRouter: Router = Router()
 // get user information base on token
 userRouter.get("/", validateUser, async (req: userRequest, res: Response) => {
     try {
+        console.log(req.user)
         if (req.user) {
             const user = await User.findById(req.user._id)
             if (user) {
@@ -31,7 +32,7 @@ userRouter.get("/", validateUser, async (req: userRequest, res: Response) => {
 })
 
 // user registration
-userRouter.post("/register", registerValidators(), async(req: Request, res: Response) => {
+userRouter.post("/register", decryptCredentials, registerValidators(), async(req: Request, res: Response) => {
     
     // check for validationErrors
     const validationErrors: Result<ValidationError> = validationResult(req)
@@ -41,6 +42,7 @@ userRouter.post("/register", registerValidators(), async(req: Request, res: Resp
     }
 
     try {
+        console.log(req.body)
         // Check if username is in use:
         const existingUser: IUser | null = await User.findOne({username: req.body.username})
         if (existingUser) {
@@ -65,7 +67,7 @@ userRouter.post("/register", registerValidators(), async(req: Request, res: Resp
 })
 
 // User login
-userRouter.post("/login", loginValidators(), async(req: Request, res: Response) => {
+userRouter.post("/login", decryptCredentials, loginValidators(), async(req: Request, res: Response) => {
 
     // check for validationErrors
     const validationErrors: Result<ValidationError> = validationResult(req)
@@ -75,17 +77,18 @@ userRouter.post("/login", loginValidators(), async(req: Request, res: Response) 
     }
 
     try {
+        console.log(req.body)
         // check for correct credentials
         const user: IUser | null = await User.findOne({username: req.body.username});
-        if (user && (bcrypt.compareSync(user.password as string, req.body.password))) {
+        if (user && (bcrypt.compareSync(req.body.password, user.password as string))) {
             // if valid credentials:
-            
+            console.log("hello world!")            
             // JWT payload
             const jwtPayload: JwtPayload = {
                 _id: user._id,
                 username: user.username
             };
-            
+
             // construct JWT and return 200
             const token: string = jwt.sign(jwtPayload, process.env.JWT_SECRET as string, {expiresIn: "2h"})
             return void res.status(200).json({success: true, token})

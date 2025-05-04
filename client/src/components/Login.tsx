@@ -1,55 +1,83 @@
 import { Box, Button, Paper, TextField, Typography } from "@mui/material"
 import {useState, useEffect} from "react"
 import { useNavigate } from "react-router-dom"
-import NodeRSA from "encrypt-rsa"
+import forge from "node-forge";
 
 function Login() {
     const [loading, setLoading] = useState<boolean>(() => {return true})
     const [username, setUsername] = useState<string>(() => {return ""})
     const [password, setPassword] = useState<string>(() => {return ""})
-    const [encryptedUsername, setEncryptedUsername] = useState<string>(() => {return ""})
-    const [encryptedPassword, setEncryptedPassword] = useState<string>(() => {return ""})
 
     // use asymmetrical RSA public key to encrypt username and password before sending them
-    const encryptCredentials = async () => {
-        const nodeRSA = new NodeRSA()
-        setEncryptedUsername(nodeRSA.encryptStringWithRsaPublicKey({text: username, publicKey:"-----BEGIN PUBLIC KEY-----MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC1NhpEyZ0OR7ENh8e1qW/hDwBpzJAHyUrGqZSkUIXKTPhcJRcNOoc5bj9ZE8ZJUGAe9pZfGrks6xXvlX0QbrQ7cviVg5ENZzu0Ukrf+3NH9YIyd80zWhJSpVczAaL849/Zy7Gdj8ONlqR9jjT4kLU+9NvcB+Nf7pOn3+jQmg8NEQIDAQAB-----END PUBLIC KEY-----"}))
-        setEncryptedPassword(nodeRSA.encryptStringWithRsaPublicKey({text: password, publicKey:"-----BEGIN PUBLIC KEY-----MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC1NhpEyZ0OR7ENh8e1qW/hDwBpzJAHyUrGqZSkUIXKTPhcJRcNOoc5bj9ZE8ZJUGAe9pZfGrks6xXvlX0QbrQ7cviVg5ENZzu0Ukrf+3NH9YIyd80zWhJSpVczAaL849/Zy7Gdj8ONlqR9jjT4kLU+9NvcB+Nf7pOn3+jQmg8NEQIDAQAB-----END PUBLIC KEY-----"}))
-    }
+    const encryptCredentials = () => {
+        try {
+            const publicKeyPem = `-----BEGIN PUBLIC KEY-----
+    MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC1NhpEyZ0OR7ENh8e1qW/hDwBp
+    zJAHyUrGqZSkUIXKTPhcJRcNOoc5bj9ZE8ZJUGAe9pZfGrks6xXvlX0QbrQ7cviV
+    g5ENZzu0Ukrf+3NH9YIyd80zWhJSpVczAaL849/Zy7Gdj8ONlqR9jjT4kLU+9Nvc
+    B+Nf7pOn3+jQmg8NEQIDAQAB
+    -----END PUBLIC KEY-----`;
+    
+            const publicKey = forge.pki.publicKeyFromPem(publicKeyPem);
+    
+            // encrypt the username
+            const encryptedUsername = forge.util.encode64(
+                publicKey.encrypt(username, "RSA-OAEP", {
+                    md: forge.md.sha256.create(),
+                })
+            );
+            // encrupt password
+            const encryptedPassword = forge.util.encode64(
+                publicKey.encrypt(password, "RSA-OAEP", {
+                    md: forge.md.sha256.create(),
+                })
+            );
+    
+            return ({
+                username: encryptedUsername,
+                password: encryptedPassword
+            })
+        } catch (error: any) {
+            console.error("Error encrypting credentials:", error);
+        }
+    };
 
     // login with encrypted credentials
     const handleLogin = async () => {
-        await encryptCredentials()
+        const encryptedCredentials: any = encryptCredentials()
+        console.log(username, password)
 
         const res = await fetch("api/user/login", {
             method: "post",
             headers: {
-                "Content-Type": "application.json"
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                username: encryptedUsername,
-                password: encryptedPassword
+                username: encryptedCredentials.username,
+                password: encryptedCredentials.password
             })
         })
         if (res.ok) {
             const token = await res.json()
-            localStorage.setItem("token", token)
+            console.log(token.token)
+            localStorage.setItem("token", token.token)
             window.location.href="/"
         }
     }
 
     const handleRegister = async () => {
-        await encryptCredentials()
+        const encryptedCredentials: any = encryptCredentials()
+        console.log(username, password)
 
         const res = await fetch("api/user/register", {
             method: "post",
             headers: {
-                "Content-Type": "application.json"
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                username: encryptedUsername,
-                password: encryptedPassword
-            })
+                username: encryptedCredentials.username,
+                password: encryptedCredentials.password
+        })
         })
         if (res.ok) {
             window.location.href="/login"
