@@ -45,7 +45,6 @@ function Login() {
     // login with encrypted credentials
     const handleLogin = async () => {
         const encryptedCredentials: any = encryptCredentials()
-        console.log(username, password)
 
         const res = await fetch("api/user/login", {
             method: "post",
@@ -59,7 +58,6 @@ function Login() {
         })
         if (res.ok) {
             const token = await res.json()
-            console.log(token.token)
             localStorage.setItem("token", token.token)
             window.location.href="/"
         }
@@ -67,7 +65,6 @@ function Login() {
 
     const handleRegister = async () => {
         const encryptedCredentials: any = encryptCredentials()
-        console.log(username, password)
 
         const res = await fetch("api/user/register", {
             method: "post",

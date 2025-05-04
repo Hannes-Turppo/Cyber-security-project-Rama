@@ -14,7 +14,6 @@ const decryptTraffic_1 = require("../middleware/decryptTraffic");
 const userRouter = (0, express_1.Router)();
 userRouter.get("/", validateToken_1.validateUser, async (req, res) => {
     try {
-        console.log(req.user);
         if (req.user) {
             const user = await User_1.User.findById(req.user._id);
             if (user) {
@@ -39,7 +38,6 @@ userRouter.post("/register", decryptTraffic_1.decryptCredentials, (0, userValida
         return void res.status(401).json(validationErrors);
     }
     try {
-        console.log(req.body);
         const existingUser = await User_1.User.findOne({ username: req.body.username });
         if (existingUser) {
             return void res.status(403).json({ message: `Username ${req.body.username} is in use.` });
@@ -64,7 +62,6 @@ userRouter.post("/login", decryptTraffic_1.decryptCredentials, (0, userValidator
         return void res.status(401).json(validationErrors);
     }
     try {
-        console.log(req.body);
         const user = await User_1.User.findOne({ username: req.body.username });
         if (user && (bcrypt_1.default.compareSync(req.body.password, user.password))) {
             console.log("hello world!");

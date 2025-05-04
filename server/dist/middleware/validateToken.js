@@ -9,7 +9,6 @@ const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const validateUser = (req, res, next) => {
     const token = req.header("authorization")?.split(" ")[1];
-    console.log(req.header("authorization"));
     if (!token) {
         res.status(401).json({ message: "Token not found" });
         return;

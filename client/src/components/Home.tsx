@@ -20,7 +20,6 @@ function Home() {
     useEffect (() => {
         const getUser = async () => {
             const token: string | null = localStorage.getItem("token")
-            console.log(token)
             if (!token) {
                 window.location.href="/login"
             }

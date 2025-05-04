@@ -12,7 +12,6 @@ const validateUser = (req: userRequest, res: Response, next: NextFunction) => {
 
     const token: string | undefined = req.header("authorization")?.split(" ")[1]
 
-    console.log(req.header("authorization"))
     if (!token) {
         res.status(401).json({message: "Token not found"})
         return

@@ -13,7 +13,6 @@ const userRouter: Router = Router()
 // get user information base on token
 userRouter.get("/", validateUser, async (req: userRequest, res: Response) => {
     try {
-        console.log(req.user)
         if (req.user) {
             const user = await User.findById(req.user._id)
             if (user) {
@@ -42,7 +41,6 @@ userRouter.post("/register", decryptCredentials, registerValidators(), async(req
     }
 
     try {
-        console.log(req.body)
         // Check if username is in use:
         const existingUser: IUser | null = await User.findOne({username: req.body.username})
         if (existingUser) {
@@ -77,7 +75,6 @@ userRouter.post("/login", decryptCredentials, loginValidators(), async(req: Requ
     }
 
     try {
-        console.log(req.body)
         // check for correct credentials
         const user: IUser | null = await User.findOne({username: req.body.username});
         if (user && (bcrypt.compareSync(req.body.password, user.password as string))) {
