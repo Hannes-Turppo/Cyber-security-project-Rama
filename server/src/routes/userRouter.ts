@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express"
+import { json, Request, Response, Router } from "express"
 import { IUser, User } from "../models/User"
 import bcrypt from "bcrypt"
 import { Result, ValidationError, validationResult } from "express-validator"
@@ -10,9 +10,28 @@ import { validateUser, userRequest } from "../middleware/validateToken"
 // declare router
 const userRouter: Router = Router()
 
+// get user information base on token
+userRouter.get("/", validateUser, async (req: userRequest, res: Response) => {
+    try {
+        if (req.user) {
+            const user = await User.findById(req.user._id)
+            if (user) {
+                return void res.status(200).json({
+                    _id: user._id,
+                    username: user.username,
+                })
+            }
+            return void res.status(404).json({message: "User not found."})                
+        }
+        return void res.status(404).json({message: "User not found."})
+    } catch (error: any) {
+        console.error(error)
+        return void res.status(500).json({message: "Server error while fetching user data."})
+    }
+})
 
 // user registration
-userRouter.post("/register", registerValidators(), async(req: userRequest, res: Response) => {
+userRouter.post("/register", registerValidators(), async(req: Request, res: Response) => {
     
     // check for validationErrors
     const validationErrors: Result<ValidationError> = validationResult(req)
@@ -46,7 +65,7 @@ userRouter.post("/register", registerValidators(), async(req: userRequest, res: 
 })
 
 // User login
-userRouter.post("/login", loginValidators(), async(req: userRequest, res: Response) => {
+userRouter.post("/login", loginValidators(), async(req: Request, res: Response) => {
 
     // check for validationErrors
     const validationErrors: Result<ValidationError> = validationResult(req)

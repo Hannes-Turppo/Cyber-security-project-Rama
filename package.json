@@ -21,5 +21,6 @@
   },
   "homepage": "https://github.com/Hannes-Turppo/Cyber-security-project-R-m-#readme",
   "dependencies": {
+    "encrypt-rsa": "^3.3.0"
   }
 }

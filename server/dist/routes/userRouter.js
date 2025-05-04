@@ -11,6 +11,25 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const userValidators_1 = require("../validators/userValidators");
 const validateToken_1 = require("../middleware/validateToken");
 const userRouter = (0, express_1.Router)();
+userRouter.get("/", validateToken_1.validateUser, async (req, res) => {
+    try {
+        if (req.user) {
+            const user = await User_1.User.findById(req.user._id);
+            if (user) {
+                return void res.status(200).json({
+                    _id: user._id,
+                    username: user.username,
+                });
+            }
+            return void res.status(404).json({ message: "User not found." });
+        }
+        return void res.status(404).json({ message: "User not found." });
+    }
+    catch (error) {
+        console.error(error);
+        return void res.status(500).json({ message: "Server error while fetching user data." });
+    }
+});
 userRouter.post("/register", (0, userValidators_1.registerValidators)(), async (req, res) => {
     const validationErrors = (0, express_validator_1.validationResult)(req);
     if (!validationErrors.isEmpty()) {

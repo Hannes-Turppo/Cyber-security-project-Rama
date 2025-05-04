@@ -1,10 +1,16 @@
 import {body} from 'express-validator';
+import NodeRSA from "encrypt-rsa"
 
 const registerValidators = () => {
     const usernameMessage: string = "Username must be at least 4 characters long";
     const passwordMessage: string = "Password must be at least 8 characters long and include uppercase and lowercase letters, numbers and special characters (#!&?)";
 
+    const nodeRSA = new NodeRSA()
+    
+    const decryptedUsername: string = nodeRSA.decryptStringWithRsaPrivateKey({text: body("username").toString(), privateKey: process.env.RSA_PRIVATE_KEY})
+    const decryptedPassword: string = nodeRSA.decryptStringWithRsaPrivateKey({text: body("password").toString(), privateKey: process.env.RSA_PRIVATE_KEY})
     return [
+
         body("username").escape().trim().isLength({min: 4}).withMessage(usernameMessage),
         body("password")
             .escape()
