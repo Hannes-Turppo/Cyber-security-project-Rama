@@ -13,20 +13,6 @@ function Home() {
         window.location.href="/login";
     }
 
-    const handleDelete = async () => {
-        const res = await fetch("/user/delete", {
-            method: "post",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(localStorage.getItem("token"))
-        })
-        if (res.ok) {
-            window.location.href="/login"
-        }
-    }
-
-
 
     // useEffect is run when user navigates to page.
     // fetch user data from server and store it in state.
@@ -65,13 +51,14 @@ function Home() {
                 </Paper>
             ) : (
                 <>
-                    <Paper>
+                    <Paper
+                        sx={{p: 5}}
+                    >
                         <Typography>
-                            Welcome {user?.username}
+                            Welcome {user?.username}!
                         </Typography>
                         <Box>
-                            <Button onClick={handleLogout}>Log out</Button>
-                            <Button onClick={handleDelete}>Delete account</Button>
+                            <Button sx={{mt: 2}} variant="outlined" onClick={handleLogout}>Log out</Button>
                         </Box>
                     </Paper>
                 </>

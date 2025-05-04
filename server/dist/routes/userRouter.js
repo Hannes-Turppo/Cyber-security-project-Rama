@@ -82,25 +82,4 @@ userRouter.post("/login", decryptTraffic_1.decryptCredentials, (0, userValidator
         return void res.status(500).json({ message: "Server error while logging in" });
     }
 });
-userRouter.post("/delete", validateToken_1.validateUser, async (req, res) => {
-    try {
-        const user = req.user;
-        const existingUser = await User_1.User.findById(req.body.id);
-        if (!existingUser) {
-            return void res.status(400).json({ message: `Bad request` });
-        }
-        if (existingUser && (user.id === req.body.id)) {
-            await User_1.User.deleteOne({ id: req.body.id });
-            return void res.status(200).json({ message: `User ${req.body.id} succesfully deleted.` });
-        }
-        else {
-            console.log(`User ${user.id} blocked from deleting user ${req.body.id}`);
-            return void res.status(401).json({ message: `Unauthorized` });
-        }
-    }
-    catch (error) {
-        console.error(`Error while deleting user: ${error}`);
-        return void res.status(500).json({ message: `Error while deleting user` });
-    }
-});
 exports.default = userRouter;

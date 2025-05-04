@@ -1,4 +1,4 @@
-import { json, Request, Response, Router } from "express"
+import { Request, Response, Router } from "express"
 import { IUser, User } from "../models/User"
 import bcrypt from "bcrypt"
 import { Result, ValidationError, validationResult } from "express-validator"
@@ -102,39 +102,5 @@ userRouter.post("/login", decryptCredentials, loginValidators(), async(req: Requ
     }
 
 })
-
-// delete user
-userRouter.post("/delete", validateUser, async ( req: userRequest, res: Response ) => {
-    try {
-        // check if user exists
-        const user: any = req.user
-        const existingUser: IUser | null = await User.findById(req.body.id)
-
-        if (!existingUser) {
-            return void res.status(400).json({message: `Bad request`})
-        }
-
-        // if user deletes itself, delete user.
-        if ( existingUser && ( user.id === req.body.id )) {
-
-            // Delete user
-            await User.deleteOne({id: req.body.id})
-            return void res.status(200).json({message: `User ${req.body.id} succesfully deleted.`})
-
-
-        // If user tries to delete someone else, return 401
-        } else {
-            console.log(`User ${user.id} blocked from deleting user ${req.body.id}`)
-            return void res.status(401).json({message: `Unauthorized`})
-        }
-
-
-    // Error handling
-    } catch (error: any) {
-        console.error(`Error while deleting user: ${error}`)
-        return void res.status(500).json({message: `Error while deleting user`})
-    }
-})
-
 
 export default userRouter

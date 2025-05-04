@@ -6,8 +6,9 @@ const registerValidators = () => {
 
     return [
         body("username").escape().trim().isLength({min: 4}).withMessage(usernameMessage),
-        body("password")
-            .escape()
+        body("password").escape()
+
+        // these don't fit the project purpose and inhibit testing.
             // .isLength({min: 8}).withMessage(passwordMessage)
             // .matches(/[A-Z]/).withMessage(passwordMessage)
             // .matches(/[a-z]/).withMessage(passwordMessage)

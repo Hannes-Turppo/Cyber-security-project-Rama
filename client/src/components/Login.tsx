@@ -105,18 +105,23 @@ function Login() {
             ) : (
                 <>
                     <Paper>
-                        <Typography sx={{fontSize: 20, pt: 5, pb: 2}}>Login or register</Typography>
-                        <Box>
+                        <Typography sx={{fontSize: 20, pt: 3, mb: 2}}>Login or register</Typography>
+                        <Box
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column"
+                            }}
+                        >
                             <TextField
                                 placeholder="Username" 
                                 onChange={(e) => {setUsername(e.target.value)}} 
-                                sx={{ml: 1}}
+                                sx={{mx: 2}}
                             />
                             <TextField
                                 type="password"
                                 placeholder="Password" 
                                 onChange={(e) => {setPassword(e.target.value)}} 
-                                sx={{ml: 0.5, mr: 1}}
+                                sx={{mx: 2, mt: 1}}
                             />
                         </Box>
                         <Box>
