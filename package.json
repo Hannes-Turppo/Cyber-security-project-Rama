@@ -19,5 +19,7 @@
   "bugs": {
     "url": "https://github.com/Hannes-Turppo/Cyber-security-project-R-m-/issues"
   },
-  "homepage": "https://github.com/Hannes-Turppo/Cyber-security-project-R-m-#readme"
+  "homepage": "https://github.com/Hannes-Turppo/Cyber-security-project-R-m-#readme",
+  "dependencies": {
+  }
 }
